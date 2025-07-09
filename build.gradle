@@ -8,7 +8,7 @@ plugins {
 }
 
 repositories {
-	// Add repositories to retrieve artifacts from in here.
+	// Add repositories to retrieve artifacts from, here
 	mavenCentral()
 	flatDir {
 		dirs "libs"
@@ -25,6 +25,16 @@ repositories {
 	}
 	maven {
 		url = "https://repo.cleanroommc.com/snapshots/"
+	}
+	exclusiveContent {
+		forRepository {
+			maven {
+				url = "https://maven.crystaelix.com/releases/"
+			}
+		}
+		filter {
+			includeGroup "com.crystaelix"
+		}
 	}
 	exclusiveContent {
 		forRepository {
@@ -64,8 +74,8 @@ tasks.withType(JavaCompile).configureEach {
 loom {
 	silentMojangMappingsLicense()
 	legacyForge {
-		// Uncomment the following line for early mixin json configs.
-		//mixinConfig "${mod_id}.mixins.json"
+		// Specify early mixin json configs here, requires MixinConBooter
+		mixinConfig "${mod_id}.mixins.json"
 	}
 
 	mixin.defaultRefmapName = "${mod_id}.refmap.json"
@@ -88,10 +98,14 @@ loom {
 dependencies {
 	// Use an updated version of log4j
 	implementation "org.apache.logging.log4j:log4j-core:${log4j_version}"
-
+	
+	// Minecraft dependencies, required
 	minecraft "com.mojang:minecraft:1.12.2"
 	mappings "de.oceanlabs.mcp:mcp_stable:${mcp_version}"
 	cleanroom "com.cleanroommc:cleanroom:${cleanroom_version}"
+
+	// MixinConBooter, needed if early mixins are required
+	implementation "com.crystaelix:mixinconbooter:${mixinconbooter_version}"
 
 	// Example dependencies
 	modImplementation "mezz:jei:${hei_version}"
@@ -121,12 +135,6 @@ def manifestAttributes = [
 	"Implementation-Title": archivesBaseName,
 	"Implementation-Version": mod_version,
 	"Implementation-Vendor": mod_author,
-
-	// Uncomment the following lines for early mixin json configs.
-	//"TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
-	//"TweakOrder": "0",
-	//"ForceLoadAsMod": "true",
-	//"FMLCorePluginContainsFMLMod": "true",
 ]
 
 jar {
@@ -145,4 +153,19 @@ publishMods {
 	type = ALPHA
 	modLoaders.add("forge")
 	additionalFiles.from(sourcesJar.archiveFile)
+
+	curseforge {
+		projectId = curseforge_project_id
+		accessToken = providers.gradleProperty("curseforge.token")
+		minecraftVersions.add("1.12.2")
+		// MixinConBooter dependency, needed if simple early mixins are required
+		requires "mixinconbooter"
+	}
+	modrinth {
+		projectId = modrinth_project_id
+		accessToken = providers.gradleProperty("modrinth.token")
+		minecraftVersions.add("1.12.2")
+		// MixinConBooter dependency, needed if simple early mixins are required
+		requires "mixinconbooter"
+	}
 }
