@@ -1,5 +1,5 @@
 plugins {
-	id "com.crystaelix.loom" version "1.13-SNAPSHOT"
+	id "com.crystaelix.loom" version "1.17-SNAPSHOT"
 	id "eclipse"
 	id "idea"
 	id "maven-publish"
@@ -102,9 +102,6 @@ dependencies {
 	mappings "de.oceanlabs.mcp:mcp_stable:${mcp_version}"
 	cleanroom "com.cleanroommc:cleanroom:${cleanroom_version}"
 
-	// MixinConBooter, needed if early mixins are required
-	implementation "com.crystaelix:mixinconbooter:${mixinconbooter_version}"
-
 	// Example dependencies
 	modImplementation "mezz:jei:${hei_version}"
 }
@@ -156,14 +153,13 @@ publishMods {
 		projectId = curseforge_project_id
 		accessToken = providers.gradleProperty("curseforge.token")
 		minecraftVersions.add("1.12.2")
-		// MixinConBooter dependency, needed if simple early mixins are required
-		requires "mixinconbooter"
+		client = true
+		server = true
 	}
 	modrinth {
 		projectId = modrinth_project_id
 		accessToken = providers.gradleProperty("modrinth.token")
 		minecraftVersions.add("1.12.2")
-		// MixinConBooter dependency, needed if simple early mixins are required
-		requires "mixinconbooter"
+		environment = CLIENT_AND_SERVER
 	}
 }
